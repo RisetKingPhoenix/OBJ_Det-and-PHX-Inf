@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Stream, Pixhawk Data, and Mask Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .container img {
+            border: 2px solid #333;
+            border-radius: 8px;
+        }
+        .video-container, .mask-container, .data-container {
+            flex: 1;
+            min-width: 400px;
+            max-width: 400px;
+        }
+        .data-container {
+            text-align: left;
+            background-color: #fff;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 20px; /* Add space above the data container */
+        }
+        .video-container, .mask-container {
+            margin-bottom: 20px; /* Add space below the video container and above the mask container */
+        }
+    </style>
+</head>
+<body>
+    <h1>Video Stream, Pixhawk Data, and Mask Viewer</h1>
+    <div class="container">
+        <div class="video-container">
+            <h2>Video Stream</h2>
+            <img src="{{ url_for('video_feed') }}" width="400" height="300" />
+        </div>
+        <div class="data-container">
+            <h2>Pixhawk Data</h2>
+            <div id="pixhawk-data">
+                <p>Altitude: <span id="altitude">Loading...</span></p>
+                <p>Battery: <span id="battery">Loading...</span></p>
+                <p>Latitude: <span id="latitude">Loading...</span></p>
+                <p>Longitude: <span id="longitude">Loading...</span></p>
+            </div>
+        </div>
+        <div class="mask-container">
+            <h2>Mask</h2>
+            <img src="{{ url_for('mask_feed') }}" width="400" height="300" />
+        </div>
+    </div>
+
+    <script>
+        function fetchPixhawkData() {
+            fetch('/pixhawk_data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('altitude').innerText = data.altitude || 'N/A';
+                    document.getElementById('battery').innerText = data.battery || 'N/A';
+                    document.getElementById('latitude').innerText = data.latitude || 'N/A';
+                    document.getElementById('longitude').innerText = data.longitude || 'N/A';
+                })
+                .catch(error => console.error('Error fetching Pixhawk data:', error));
+        }
+
+        // Fetch Pixhawk data every second
+        setInterval(fetchPixhawkData, 300);
+    </script>
+</body>
+</html>
